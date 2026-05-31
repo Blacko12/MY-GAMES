@@ -1,0 +1,1 @@
+node_modules/\ndist/\nbuild/\n.expo/\n.expo-shared/\n*.jks\n*.p8\n*.p12\n*.key\n*.mobileprovision\n*.orig.*\nweb-build/\n.env\n.DS_Store\n.vscode/\n.idea/\n*.log\n
