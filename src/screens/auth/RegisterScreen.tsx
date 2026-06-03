@@ -12,25 +12,32 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuthStore } from '../../store/authStore';
 
-const LoginScreen = ({ navigation }: any) => {
+const RegisterScreen = ({ navigation }: any) => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuthStore();
+  const { register } = useAuthStore();
 
-  const handleLogin = async () => {
-    if (!phoneNumber || !password) {
+  const handleRegister = async () => {
+    if (!phoneNumber || !name || !password || !confirmPassword) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
     setError('');
     try {
-      await login(phoneNumber, password);
+      await register(phoneNumber, name, password);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -40,11 +47,19 @@ const LoginScreen = ({ navigation }: any) => {
     <LinearGradient colors={['#075E54', '#128C7E']} style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>ChatterBox</Text>
-          <Text style={styles.subtitle}>Connect. Chat. Share.</Text>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Join ChatterBox today</Text>
         </View>
 
         <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name"
+            placeholderTextColor="#999"
+            value={name}
+            onChangeText={setName}
+            editable={!loading}
+          />
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
@@ -63,26 +78,35 @@ const LoginScreen = ({ navigation }: any) => {
             onChangeText={setPassword}
             editable={!loading}
           />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#999"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            editable={!loading}
+          />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
           <TouchableOpacity
-            style={[styles.loginButton, loading && styles.disabledButton]}
-            onPress={handleLogin}
+            style={[styles.registerButton, loading && styles.disabledButton]}
+            onPress={handleRegister}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.loginButtonText}>Login</Text>
+              <Text style={styles.registerButtonText}>Sign Up</Text>
             )}
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.signupLink}>Sign up</Text>
+          <Text style={styles.footerText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Login</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -100,12 +124,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    marginTop: 60,
+    marginTop: 40,
     marginBottom: 40,
     alignItems: 'center',
   },
   title: {
-    fontSize: 40,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -131,7 +155,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 14,
   },
-  loginButton: {
+  registerButton: {
     backgroundColor: '#25D366',
     borderRadius: 10,
     paddingVertical: 12,
@@ -140,7 +164,7 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.6,
   },
-  loginButtonText: {
+  registerButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
@@ -154,11 +178,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
   },
-  signupLink: {
+  loginLink: {
     color: '#25D366',
     fontSize: 14,
     fontWeight: 'bold',
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
